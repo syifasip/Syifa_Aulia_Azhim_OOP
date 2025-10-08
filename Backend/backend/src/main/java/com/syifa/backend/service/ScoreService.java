@@ -23,30 +23,21 @@ public class ScoreService {
     @Autowired
     private PlayerService playerService;
 
-    /**
-     * Silahkan tulis kode dibawah ini
-     */
     @Transactional
-    public Score createScore(Score score){
-        UUID playerId = score.getPlayerId();
-        if (!playerRepository.existsById(playerId)) {
-            throw new RuntimeException("Player not found with ID: " + playerId);
+    public Score createScore(Score score) {
+        if (!playerRepository.existsById(score.getPlayerId())) {
+            throw new RuntimeException("Player not found with ID: " + score.getPlayerId());
         }
         Score savedScore = scoreRepository.save(score);
-        playerService.updatePlayerStats(
-                playerId,
-                score.getValue(),
-                score.getCoinsCollected(),
-                score.getDistanceTravelled()
-        );
+        playerService.updatePlayerStats(savedScore);
         return savedScore;
     }
 
-    public Optional<Score>getScoreById(UUID scoreId){
+    public Optional<Score>getScoreById(UUID scoreId) {
         return scoreRepository.findById(scoreId);
     }
 
-    public List<Score> getAllScores(){
+    public List<Score> getAllScores() {
         return scoreRepository.findAll();
     }
 
@@ -63,14 +54,12 @@ public class ScoreService {
     }
 
     public List<Score> getHighestScoreByPlayerId(UUID playerId) {
-        if (playerId.isEmpty()) {
+        List<Score> scores = scoreRepository.findHighestScoreByPlayerId(playerId);
+        if (scores.isEmpty()) {
             return Optional.empty();
         } else {
-            return Optional.of()
+            return Optional.of(scores.get(0));
         }
-5
-        return scoreRepository.findHighestScoreByPlayerId(playerId);
-
     }
 
     public List<Score> getScoresAboveValue(Integer minValue) {
@@ -82,40 +71,40 @@ public class ScoreService {
     }
 
     public Integer getTotalCoinsByPlayerId(UUID playerId) {
-        return scoreRepository.getTotalCoinsByPlayerId(playerId);
-        if (getTotalCoinsByPlayerId() == null) {
-            return 0;
-        } else {
-            return getTotalCoinsByPlayerId(UUID playerId);
-        }
+        Integer total = scoreRepository.getTotalCoinsByPlayerId(playerId);
+        return total != null ? total : 0;
     }
 
     public Integer  getTotalDistanceByPlayerId(UUID playerId) {
-        return scoreRepository.getTotalDistanceByPlayerId(playerId);
-        if (getTotalDistanceByPlayerId() == null) {
-            return 0;
-        } else {
-            return  getTotalDistanceByPlayerId(UUID playerId);
-        }
+        Integer total = scoreRepository.getTotalDistanceByPlayerId(playerId);
+        return total != null ? total : 0;
     }
 
     public Score  updateScore(UUID scoreId, Score updatedScore) {
-        if (!scoreRepository.findById(scoreId)) {
-            throw new RuntimeException("Score not found with ID: " + playerId);
+        Score existingScore = scoreRepository.findById(scoreId)
+                .orElseThrow() -> new RuntimeException("Score not found with ID: " + scoreId);
+
+        if (updatedScore.getValue() != null) {
+            existingScore.setValue(updatedScore.getValue());
+        }
+        if (updatedScore.getCoinsCollected() != null) {
+            existingScore.setCoinsCollected(updatedScore.getCoinsCollected());
+        }
+        if (updatedScore.getDistanceTravelled() != null) {
+            existingScore.setDistanceTravelled(updatedScore.getDistanceTravelled());
         }
         return scoreRepository.save(existingScore);
     }
 
     public void deleteScore(UUID scoreId) {
-                if (!scoreRepository.existsById()) {
-            throw new RuntimeException("Score not found with ID: " + playerId);
+        if (!scoreRepository.existsById(scoreId)) {
+            throw new RuntimeException("Score not found with ID: " + scoreId);
         }
         return scoreRepository.deleteById(scoreId);
     }
 
     public void deleteScoresByPlayerId(UUID playerId) {
-        scoreRepository.findByPlayerId(playerId);
-        scoreRepository.deleteAll();
+        List<Score> scores = scoreRepository.findByPlayerId(playerId);
+        scoreRepository.deleteAll(scores);
     }
-
 }

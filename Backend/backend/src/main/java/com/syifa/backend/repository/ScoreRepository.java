@@ -16,8 +16,8 @@ public interface ScoreRepository extends JpaRepository<Score, UUID> {
     List<Score> findAllByOrderByCreatedAtDesc();
 
     //Dengan Query
-    @Query("SELECT s FROM Score s ORDER BY s.value DESC")
-    List<Score> findTopScores(int limit);
+    @Query(value = "SELECT * FROM scores ORDER BY value DESC LIMIT :limit", nativeQuery = true)
+    List<Score> findTopScores(@Param("limit") int limit);
 
     @Query("SELECT s FROM Score s WHERE s.playerId = :playerId ORDER BY s.value DESC")
     List<Score> findHighestScoreByPlayerId(@Param("playerId") UUID playerId);
