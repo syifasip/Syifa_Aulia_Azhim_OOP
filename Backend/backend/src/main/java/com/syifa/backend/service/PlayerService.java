@@ -15,6 +15,12 @@ public class PlayerService {
     @Autowired
     private PlayerRepository playerRepository;
 
+    /**
+     * Create a new player
+     * @param player the player to create
+     * @return the created player
+     * @throws RuntimeException if username already exists
+     */
     public Player createPlayer(Player player) {
         if (playerRepository.existsByUsername(player.getUsername())) {
             throw new RuntimeException("Username already exists: " + player.getUsername());
@@ -22,79 +28,97 @@ public class PlayerService {
         return playerRepository.save(player);
     }
 
+    /**
+     * Get player by ID
+     */
     public Optional<Player> getPlayerById(UUID playerId) {
         return playerRepository.findById(playerId);
     }
 
+    /**
+     * Get player by username
+     */
     public Optional<Player> getPlayerByUsername(String username) {
         return playerRepository.findByUsername(username);
     }
 
+    /**
+     * Get all players
+     */
     public List<Player> getAllPlayers() {
         return playerRepository.findAll();
     }
 
+    /**
+     * Update player profile
+     */
     public Player updatePlayer(UUID playerId, Player updatedPlayer) {
         Player existingPlayer = playerRepository.findById(playerId)
                 .orElseThrow(() -> new RuntimeException("Player not found with ID: " + playerId));
 
-        // Update username jika berbeda dan tersedia
+        // Update username
         if (updatedPlayer.getUsername() != null &&
                 !updatedPlayer.getUsername().equals(existingPlayer.getUsername())) {
 
-            if (isUsernameExists(updatedPlayer.getUsername())) {
+            if (playerRepository.existsByUsername(updatedPlayer.getUsername())) {
                 throw new RuntimeException("Username already exists: " + updatedPlayer.getUsername());
             }
             existingPlayer.setUsername(updatedPlayer.getUsername());
         }
 
-        // Update high score jika lebih tinggi
+        // Update high score
         if (updatedPlayer.getHighScore() != null) {
             existingPlayer.setHighScore(updatedPlayer.getHighScore());
         }
 
-        // Update fields lainnya (cara sama)
+        // Update coins
         if (updatedPlayer.getTotalCoins() != null) {
             existingPlayer.setTotalCoins(updatedPlayer.getTotalCoins());
         }
 
+        // Update distance
         if (updatedPlayer.getTotalDistance() != null) {
             existingPlayer.setTotalDistance(updatedPlayer.getTotalDistance());
         }
 
-        playerRepository.save(existingPlayer);
-        return existingPlayer;
+        return playerRepository.save(existingPlayer);
     }
 
+    /**
+     * Delete player by ID
+     */
     public void deletePlayer(UUID playerId) {
-        if (!playerRepository.existsById(playerId))
+        if (!playerRepository.existsById(playerId)) {
             throw new RuntimeException("Player not found with ID: " + playerId);
+        }
         playerRepository.deleteById(playerId);
     }
 
-    public void deletePlayerByUsername(String username) {
-        Player player = playerRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Player not found with username: " + username));
-        playerRepository.delete(player);
-    }
-
+    /**
+     * Update player statistics (nullable param)
+     */
     public Player updatePlayerStats(UUID playerId, Integer scoreValue, Integer coinsCollected, Integer distanceTravelled) {
         Player player = playerRepository.findById(playerId)
                 .orElseThrow(() -> new RuntimeException("Player not found with ID: " + playerId));
 
-        // Update high score if this score is higher
-        player.updateHighScore(scoreValue);
+        if (scoreValue != null) {
+            player.updateHighScore(scoreValue);
+        }
+        if (coinsCollected != null) {
+            player.addCoins(coinsCollected);
+        }
+        if (distanceTravelled != null) {
+            player.addDistance(distanceTravelled);
+        }
 
-        // Add coins and distance to totals
-        player.addCoins(coinsCollected);
-        player.addDistance(distanceTravelled);
-
-        playerRepository.save(player);
-        return player;
+        return playerRepository.save(player);
     }
 
+    /**
+     * Leaderboards
+     */
     public List<Player> getLeaderboardByHighScore(int limit) {
-        return playerRepository.findTopPlayersByHighScore(limit);
+        return playerRepository.findTOpPlayersByHighScore(limit);
     }
 
     public List<Player> getLeaderboardByTotalCoins() {
@@ -102,11 +126,13 @@ public class PlayerService {
     }
 
     public List<Player> getLeaderboardByTotalDistance() {
-        return playerRepository.findAllByOrderByTotalDistanceTravelledDesc();
+        return playerRepository.findAllByOrderByTotalDistanceDesc();
     }
 
-
+    /**
+     * Check if username exists
+     */
     public boolean isUsernameExists(String username) {
-        return playerRepository.findByUsername(username).isPresent();
+        return playerRepository.existsByUsername(username);
     }
 }
