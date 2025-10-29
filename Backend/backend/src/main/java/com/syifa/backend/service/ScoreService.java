@@ -29,7 +29,10 @@ public class ScoreService {
             throw new RuntimeException("Player not found with ID: " + score.getPlayerId());
         }
         Score savedScore = scoreRepository.save(score);
-        playerService.updatePlayerStats(savedScore);
+        playerService.updatePlayerStats(savedScore.getPlayerId(),
+                savedScore.getValue(),
+                savedScore.getCoinsCollected(),
+                savedScore.getDistanceTravelled());
         return savedScore;
     }
 
@@ -53,7 +56,7 @@ public class ScoreService {
         return scoreRepository.findTopScores(limit);
     }
 
-    public List<Score> getHighestScoreByPlayerId(UUID playerId) {
+    public Optional<Score> getHighestScoreByPlayerId(UUID playerId) {
         List<Score> scores = scoreRepository.findHighestScoreByPlayerId(playerId);
         if (scores.isEmpty()) {
             return Optional.empty();
@@ -82,7 +85,7 @@ public class ScoreService {
 
     public Score  updateScore(UUID scoreId, Score updatedScore) {
         Score existingScore = scoreRepository.findById(scoreId)
-                .orElseThrow() -> new RuntimeException("Score not found with ID: " + scoreId);
+                .orElseThrow(); new RuntimeException("Score not found with ID: " + scoreId);
 
         if (updatedScore.getValue() != null) {
             existingScore.setValue(updatedScore.getValue());
@@ -100,7 +103,7 @@ public class ScoreService {
         if (!scoreRepository.existsById(scoreId)) {
             throw new RuntimeException("Score not found with ID: " + scoreId);
         }
-        return scoreRepository.deleteById(scoreId);
+        scoreRepository.deleteById(scoreId);
     }
 
     public void deleteScoresByPlayerId(UUID playerId) {

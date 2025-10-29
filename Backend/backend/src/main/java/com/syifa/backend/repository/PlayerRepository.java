@@ -16,9 +16,9 @@ public interface PlayerRepository extends JpaRepository<Player, UUID> {
     boolean existsByUsername(String username);
 
     @Query("SELECT p FROM Player p ORDER BY p.highScore DESC")
-    List<Player> findTOpPlayersByHighScore(@Param("limit") int limit);
+    List<Player> findTopPlayersByHighScore(@Param("limit") int limit);
 
     List<Player> findByHighScoreGreaterThan(Integer minScore);
     List<Player> findAllByOrderByTotalCoinsDesc();
-    List<Player> findAllByOrderByTotalDistanceDesc();
+    List<Player> findAllByOrderByTotalDistanceTravelledDesc();
 }

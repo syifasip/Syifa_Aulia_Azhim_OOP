@@ -1,4 +1,4 @@
 package Repository;
 
-public class BaseRepository {
+public abstract class BaseRepository {
 }
