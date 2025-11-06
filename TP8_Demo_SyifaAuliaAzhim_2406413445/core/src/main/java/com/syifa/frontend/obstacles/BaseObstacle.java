@@ -12,23 +12,25 @@ public abstract class BaseObstacle {
     protected boolean active = false;
 
     public BaseObstacle(Vector2 startPosition, int length) {
-        this.position = startPosition;
+        this.position = new Vector2(startPosition);
         this.length = length;
         updateCollider();
     }
-    public void Initialize(Vector2 startPosition, int length) {
+    public void initialize(Vector2 startPosition, int length) {
         this.position = startPosition;
         this.length = length;
         updateCollider();
     }
 
     public void render(ShapeRenderer shapeRenderer) {
-        if (!active) return;
-        drawShape(shapeRenderer);
+        if (!active) {
+            drawShape(shapeRenderer);
+        }
+
     }
 
     public boolean isColliding(Rectangle playerCollider) {
-        return active && collider.overlaps(playerCollider);
+        return active && collider != null && collider.overlaps(playerCollider);
     }
 
     public boolean isActive() {
@@ -40,8 +42,8 @@ public abstract class BaseObstacle {
 
     protected abstract void updateCollider();
     protected abstract void drawShape(ShapeRenderer shapeRenderer);
-    public abstract float getRenderWidth();
-    public abstract float getRenderHeight();
+    protected abstract float getRenderWidth();
+    protected abstract float getRenderHeight();
 
     public void setActive(boolean active) {
         this.active = active;
@@ -54,6 +56,4 @@ public abstract class BaseObstacle {
     public Vector2 getPosition() {
         return position;
     }
-
-
 }
