@@ -1,11 +1,10 @@
 package com.syifa.frontend;
 
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 
 public class Player {
-    // atribut yang hanya diakses di dalam class ini
     private Vector2 position;
     private Vector2 velocity;
     private float gravity = 2000f;
@@ -15,105 +14,109 @@ public class Player {
     private float width = 64f;
     private float height = 64f;
 
-    // sistem kecepatan
+    // Speed system
     private float baseSpeed = 300f;
     private float distanceTraveled = 0f;
 
-    // konstruktor publik
+    // Death system
+    private boolean isDead = false;
+    private Vector2 startPosition;
+
     public Player(Vector2 startPosition) {
-        this.position = new Vector2(startPosition);
-        this.velocity = new Vector2(baseSpeed, 0f);
-        this.collider = new Rectangle(position.x, position.y, width, height);
+        this.startPosition = new Vector2(startPosition);
+        position = new Vector2(startPosition);
+
+        collider = new Rectangle(
+            position.x,
+            position.y,
+            width,
+            height
+        );
+        velocity = new Vector2(baseSpeed, 0);
     }
 
-    // update publik: menggabungkan beberapa private step
     public void update(float delta, boolean isFlying) {
-        updateDistanceAndSpeed(delta);
-        applyGravity(delta);
-        if (isFlying) {
-            fly(delta);
+        if (!isDead) {
+            updateDistanceAndSpeed(delta);
+            applyGravity(delta);
+            if (isFlying) {
+                fly(delta);
+            }
+            updatePosition(delta);
         }
-        updatePosition(delta);
         updateCollider();
     }
 
-    // menambah jarak tempuh berdasarkan kecepatan saat ini
+
     private void updateDistanceAndSpeed(float delta) {
-        // distance berdasarkan kecepatan horizontal dikalikan waktu
+        // Track distance traveled
         distanceTraveled += velocity.x * delta;
     }
 
-    // update posisi berdasarkan velocity
     private void updatePosition(float delta) {
+        // Move forward constantly
         position.x += velocity.x * delta;
+        // Apply vertical movement (gravity/jetpack)
         position.y += velocity.y * delta;
     }
 
-    // menerapkan gravitasi dan menjaga kecepatan vertikal dalam batas
     private void applyGravity(float delta) {
         velocity.y -= gravity * delta;
-
-        // pastikan kecepatan horizontal tetap baseSpeed
+        // Keep forward speed constant with current speed
         velocity.x = baseSpeed;
 
-        // clamp vertical speed
-        if (velocity.y > maxVerticalSpeed) {
-            velocity.y = maxVerticalSpeed;
-        }
+        // Clamp vertical velocity to max speed
         if (velocity.y < -maxVerticalSpeed) {
             velocity.y = -maxVerticalSpeed;
+        } else if (velocity.y > maxVerticalSpeed) {
+            velocity.y = maxVerticalSpeed;
         }
     }
 
-    // mekanik terbang: menambah dorongan ke atas
     private void fly(float delta) {
-        velocity.y += force * delta;
+        if (!isDead) {
+            velocity.y += force * delta;
+        }
     }
 
-    // update collider agar sesuai posisi
     private void updateCollider() {
-        collider.x = position.x;
-        collider.y = position.y;
-        collider.width = width;
-        collider.height = height;
+        collider.setPosition(position.x, position.y);
     }
 
-    // cek batasan: jika menabrak ground atau melewati ceiling
     public void checkBoundaries(Ground ground, float ceilingY) {
-        // ground collision
+        // Ground collision
         if (ground.isColliding(collider)) {
-            // tempatkan player tepat di atas ground
-            float topY = ground.getTopY();
-            position.y = topY; // ground Y adalah 0, getTopY() adalah tinggi -> top of ground relative to bottom (y=0)
-            // Namun instruksi ingin player tidak menembus; jika getTopY() mengembalikan tinggi ground (50),
-            // maka posisi y player harus = ground height
-            // set kecepatan vertikal 0 agar tidak bergerak
-            velocity.y = 0f;
-            updateCollider();
+            position.y = ground.getTopY();
+            velocity.y = 0;
         }
 
-        // ceiling check (jangan melewati batas atas)
+        // Ceiling collision
         if (position.y + height > ceilingY) {
             position.y = ceilingY - height;
-            velocity.y = 0f;
-            updateCollider();
-        }
-
-        // jangan jatuhkan player di bawah 0 (sebagai safety)
-        if (position.y < 0f) {
-            position.y = 0f;
-            velocity.y = 0f;
-            updateCollider();
+            velocity.y = 0;
         }
     }
 
-    // render player (warna bebas)
+    // Debug
     public void renderShape(ShapeRenderer shapeRenderer) {
-        shapeRenderer.setColor(0.2f, 0.6f, 0.9f, 1f);
+        shapeRenderer.setColor(0f, 1f, 0f, 1f);
         shapeRenderer.rect(position.x, position.y, width, height);
     }
 
-    // getters publik sesuai spesifikasi
+    public void die() {
+        isDead = true;
+        velocity.x = 0;
+        velocity.y = 0;
+    }
+
+    public void reset() {
+        isDead = false;
+        position.set(startPosition);
+        velocity.set(baseSpeed, 0);
+        distanceTraveled = 0f;
+    }
+
+    // Getters
     public Vector2 getPosition() {
         return position;
     }
@@ -130,13 +133,11 @@ public class Player {
         return collider;
     }
 
-    // jarak yang ditempuh dibagi 10 sesuai instruksi
     public float getDistanceTraveled() {
         return distanceTraveled / 10f;
     }
 
-    // getter baseSpeed (jika butuh)
-    public float getBaseSpeed() {
-        return baseSpeed;
+    public boolean isDead() {
+        return isDead;
     }
 }
