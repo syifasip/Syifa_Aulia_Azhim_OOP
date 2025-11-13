@@ -12,12 +12,14 @@ public class ScoreManager implements Subject{
         score = 0;
     }
 
+    @Override
     public void addObserver(Observer observer) {
         observers.add(observer);
     }
 
+    @Override
     public void removeObserver(Observer observer) {
-        observer.remove(observer);
+        observers.remove(observer);
     }
 
     @Override
@@ -32,14 +34,9 @@ public class ScoreManager implements Subject{
             score = newScore;
             notifyObservers(score);
         }
-
-
     }
 
     public int getScore() {
         return score;
     }
-
-
-
 }

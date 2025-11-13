@@ -1,13 +1,16 @@
 package com.syifa.frontend;
 
+import com.syifa.frontend.observers.Observer;
+import com.syifa.frontend.observers.ScoreManager;
+
 public class GameManager {
     private static GameManager instance;
 
-    private int score;
+    private ScoreManager scoreManager;
     private boolean gameActive;
 
     private GameManager() {
-        score = 0;
+        scoreManager = new ScoreManager();
         gameActive = false;
     }
 
@@ -19,17 +22,26 @@ public class GameManager {
     }
 
     public void startGame() {
-        score = 0;
+        scoreManager.setScore(0);
         gameActive = true;
         System.out.println("Game Started!");
     }
 
     public void setScore(int newScore) {
         if (gameActive) {
-            score = newScore;
+            scoreManager.setScore(newScore);
         }
     }
 
-    // Getters
-    public int getScore() { return score; }
+    public int getScore() {
+        return scoreManager.getScore();
+    }
+
+    public void addObserver(Observer observer) {
+        scoreManager.addObserver(observer);
+    }
+
+    public void removeObserver(Observer observer) {
+        scoreManager.removeObserver(observer);
+    }
 }

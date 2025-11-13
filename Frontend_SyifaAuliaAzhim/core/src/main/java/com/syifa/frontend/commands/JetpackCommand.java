@@ -10,9 +10,10 @@ public class JetpackCommand implements Command{
 
     @Override
     public void execute() {
-        if (player != null) {
-            player.fly();
-        }
+        if (player == null) return;
+        if (player.isDead()) return;
+        player.fly();
+
     }
 
 }

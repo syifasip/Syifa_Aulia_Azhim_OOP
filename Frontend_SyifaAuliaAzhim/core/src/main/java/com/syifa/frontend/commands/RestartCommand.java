@@ -13,10 +13,7 @@ public class RestartCommand implements Command {
 
     @Override
     public void execute() {
-        if (player != null) {
-            player.reset();
-            gameManager.setScore(0)
-        }
-
+        if (player != null) player.reset();
+        if (gameManager != null) gameManager.setScore(0);
     }
 }
