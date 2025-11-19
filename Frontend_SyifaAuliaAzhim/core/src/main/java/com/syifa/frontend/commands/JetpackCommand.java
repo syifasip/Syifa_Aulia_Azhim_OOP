@@ -1,8 +1,7 @@
 package com.syifa.frontend.commands;
 
-import com.syifa.frontend.Player;
 
-public class JetpackCommand implements Command{
+public class JetpackCommand implements Command {
     private Player player;
     public JetpackCommand(Player player) {
         this.player = player;
@@ -10,10 +9,9 @@ public class JetpackCommand implements Command{
 
     @Override
     public void execute() {
-        if (player == null) return;
-        if (player.isDead()) return;
-        player.fly();
-
+        if (!player.isDead()) {
+            player.fly();
+        }
     }
 
 }

@@ -1,7 +1,7 @@
 package com.syifa.frontend;
 
-import com.syifa.frontend.observers.Observer;
 import com.syifa.frontend.observers.ScoreManager;
+
 
 public class GameManager {
     private static GameManager instance;
@@ -33,15 +33,15 @@ public class GameManager {
         }
     }
 
-    public int getScore() {
-        return scoreManager.getScore();
-    }
+    // Getters
+    public int getScore() { return scoreManager.getScore(); }
 
-    public void addObserver(Observer observer) {
+    // Delegate observer methods to ScoreManager
+    public void addObserver(com.syifa.frontend.observers.Observer observer) {
         scoreManager.addObserver(observer);
     }
 
-    public void removeObserver(Observer observer) {
+    public void removeObserver(com.syifa.frontend.observers.Observer observer) {
         scoreManager.removeObserver(observer);
     }
 }

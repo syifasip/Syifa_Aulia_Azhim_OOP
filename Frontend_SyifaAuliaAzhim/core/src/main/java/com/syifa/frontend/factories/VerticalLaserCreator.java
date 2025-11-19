@@ -8,7 +8,7 @@ import com.syifa.frontend.pools.VerticalLaserPool;
 import java.util.List;
 import java.util.Random;
 
-class VerticalLaserCreator implements ObstacleFactory.ObstacleCreator {
+public class VerticalLaserCreator implements ObstacleFactory.ObstacleCreator {
     private static final float MIN_HEIGHT = 100f;
     private static final float MAX_HEIGHT = 300f;
 

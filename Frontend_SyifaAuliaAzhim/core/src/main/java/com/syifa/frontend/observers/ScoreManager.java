@@ -12,6 +12,7 @@ public class ScoreManager implements Subject{
         score = 0;
     }
 
+
     @Override
     public void addObserver(Observer observer) {
         observers.add(observer);
@@ -30,13 +31,14 @@ public class ScoreManager implements Subject{
     }
 
     public void setScore(int newScore) {
-        if (newScore > score) {
-            score = newScore;
-            notifyObservers(score);
+        if (newScore != this.score) {
+            this.score = newScore;
+            notifyObservers(this.score);
         }
     }
 
     public int getScore() {
         return score;
     }
+
 }

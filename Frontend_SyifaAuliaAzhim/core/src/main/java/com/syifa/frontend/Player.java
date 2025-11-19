@@ -1,9 +1,9 @@
 package com.syifa.frontend;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+
 
 public class Player {
     private Vector2 position;
@@ -41,7 +41,7 @@ public class Player {
             updateDistanceAndSpeed(delta);
             applyGravity(delta);
             if (isFlying) {
-                fly();
+                fly(delta);
             }
             updatePosition(delta);
         }
@@ -74,9 +74,9 @@ public class Player {
         }
     }
 
-    public void fly() {
+    private void fly(float delta) {
         if (!isDead) {
-            velocity.y += force * Gdx.graphics.getDeltaTime();
+            velocity.y += force * delta;
         }
     }
 
@@ -104,6 +104,12 @@ public class Player {
         shapeRenderer.rect(position.x, position.y, width, height);
     }
 
+    // Public method for command pattern
+    public void fly() {
+        if (!isDead) {
+            velocity.y += force * 1/60f; // Using a standard delta time
+        }
+    }
     public void die() {
         isDead = true;
         velocity.x = 0;
