@@ -1,4 +1,6 @@
 package com.syifa.frontend.commands;
+import com.syifa.frontend.Player;
+
 
 
 public class JetpackCommand implements Command {
