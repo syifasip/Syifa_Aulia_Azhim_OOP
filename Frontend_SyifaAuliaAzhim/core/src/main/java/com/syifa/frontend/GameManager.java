@@ -3,7 +3,7 @@ package com.syifa.frontend;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
-import com.syifa.frontend.backend.BackendService;
+import com.syifa.frontend.services.BackendServices;
 import com.syifa.frontend.observers.ScoreManager;
 
 public class GameManager {
@@ -13,8 +13,7 @@ public class GameManager {
     private ScoreManager scoreManager;
     private boolean gameActive;
 
-    // NEW: Backend & Player Data
-    private BackendService backendService;
+    private BackendServices backendService;
     private String currentPlayerId = null;
     private int coinsCollected = 0;
 
@@ -22,7 +21,7 @@ public class GameManager {
         scoreManager = new ScoreManager();
         gameActive = false;
 
-        backendService = new BackendService();
+        backendService = new BackendServices();
     }
 
     public static GameManager getInstance() {
@@ -31,8 +30,6 @@ public class GameManager {
         }
         return instance;
     }
-
-    // ---------------- GAME FLOW ----------------
 
     public void startGame() {
         scoreManager.setScore(0);
@@ -56,7 +53,7 @@ public class GameManager {
             finalScore,
             coinsCollected,
             distance,
-            new BackendService.RequestCallback() {
+            new BackendServices.RequestCallback() {
 
                 @Override
                 public void onSuccess(String response) {
@@ -71,11 +68,9 @@ public class GameManager {
         );
     }
 
-    // ---------------- PLAYER REGISTRATION ----------------
-
     public void registerPlayer(String username) {
 
-        backendService.createPlayer(username, new BackendService.RequestCallback() {
+        backendService.createPlayer(username, new BackendServices.RequestCallback() {
 
             @Override
             public void onSuccess(String response) {
@@ -99,8 +94,6 @@ public class GameManager {
         });
     }
 
-    // ---------------- COIN LOGIC ----------------
-
     public void addCoin() {
         coinsCollected++;
         Gdx.app.log("COIN", "COIN COLLECTED! Total: " + coinsCollected);
@@ -109,8 +102,6 @@ public class GameManager {
     public int getCoins() {
         return coinsCollected;
     }
-
-    // ---------------- SCORE WRAPPERS ----------------
 
     public void setScore(int distance) {
         if (gameActive) {
@@ -122,7 +113,6 @@ public class GameManager {
         return scoreManager.getScore();
     }
 
-    // Observer delegation
     public void addObserver(com.syifa.frontend.observers.Observer observer) {
         scoreManager.addObserver(observer);
     }

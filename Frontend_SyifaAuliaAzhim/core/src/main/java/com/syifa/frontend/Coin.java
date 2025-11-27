@@ -12,15 +12,12 @@ public class Coin {
     private float radius = 15f;
     private boolean active;
 
-    // Animation
     private float bobOffset = 0f;
     private float bobSpeed = 2f; // bisa kamu sesuaikan
 
     public Coin(Vector2 startPosition) {
         this.position = new Vector2(startPosition);
         this.active = false;
-
-        // Collider mengikuti center circle
         this.collider = new Rectangle(position.x - radius, position.y - radius, radius * 2, radius * 2);
     }
 
@@ -29,7 +26,6 @@ public class Coin {
 
         bobOffset += bobSpeed * delta;
 
-        // update collider mengikuti posisi
         float drawY = position.y + (float)(Math.sin(bobOffset) * 5f);
         collider.setPosition(position.x - radius, drawY - radius);
     }
@@ -46,8 +42,6 @@ public class Coin {
     public boolean isColliding(Rectangle playerCollider) {
         return active && collider.overlaps(playerCollider);
     }
-
-    // ----------- SETTER / GETTER -------------
 
     public void setPosition(float x, float y) {
         this.position.set(x, y);

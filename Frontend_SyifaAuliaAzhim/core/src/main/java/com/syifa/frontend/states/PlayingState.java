@@ -16,7 +16,7 @@ import com.syifa.frontend.factories.ObstacleFactory;
 import com.syifa.frontend.factories.CoinFactory;
 import com.syifa.frontend.obstacles.BaseObstacle;
 import com.syifa.frontend.obstacles.HomingMissile;
-import com.syifa.frontend.coins.Coin;
+import com.syifa.frontend.Coin;
 import com.syifa.frontend.observers.ScoreUIObserver;
 import com.syifa.frontend.strategies.*;
 
@@ -72,7 +72,9 @@ public class PlayingState implements GameState {
         GameManager.getInstance().addObserver(scoreUIObserver);
 
         this.obstacleFactory = new ObstacleFactory();
-        this.coinFactory = new CoinFactory(); // Tambahan
+
+        // FIX: CoinFactory tidak menerima parameter Coin.class
+        this.coinFactory = new CoinFactory();
 
         setDifficulty(new EasyDifficultyStrategy());
 
@@ -87,12 +89,14 @@ public class PlayingState implements GameState {
     @Override
     public void update(float delta) {
 
+        // ===== Jetpack Input =====
         if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
             jetpackCommand.execute();
         }
 
+        // ===== Player Mati =====
         if (player.isDead()) {
-            GameManager.getInstance().endGame(); // Tambahan
+            GameManager.getInstance().endGame();   // sesuai instruksi
             gsm.set(new GameOverState(gsm));
             return;
         }
@@ -104,10 +108,14 @@ public class PlayingState implements GameState {
         player.checkBoundaries(ground, screenHeight);
 
         updateObstacles(delta);
+
+        // ===== NEW: Pindah ke fungsi updateCoins(delta) =====
         updateCoins(delta);
+
         checkCollisions();
         checkCoinCollisions();
 
+        // ===== Skor =====
         int scoreMeters = (int) player.getDistanceTraveled();
         GameManager.getInstance().setScore(scoreMeters);
 
@@ -157,8 +165,8 @@ public class PlayingState implements GameState {
     private void spawnObstacle() {
         float cameraRight = camera.position.x + screenWidth / 2f;
         float spawnX = Math.max(
-                cameraRight + SPAWN_AHEAD_DISTANCE,
-                lastObstacleSpawnX + difficultyStrategy.getMinGap()
+            cameraRight + SPAWN_AHEAD_DISTANCE,
+            lastObstacleSpawnX + difficultyStrategy.getMinGap()
         );
 
         for (int i = 0; i < difficultyStrategy.getDensity(); i++) {
@@ -168,7 +176,10 @@ public class PlayingState implements GameState {
         }
     }
 
-    // 🔥 NEW: update coin logic
+    // ========================================================
+    //                NEW: UPDATE COINS
+    // ========================================================
+
     private void updateCoins(float delta) {
 
         coinSpawnTimer += delta;
@@ -183,6 +194,7 @@ public class PlayingState implements GameState {
 
         for (Coin c : coinFactory.getActiveCoins()) {
             c.update(delta);
+
             if (c.isOffScreenCamera(cameraLeft)) {
                 coinFactory.releaseCoin(c);
             }
@@ -199,12 +211,16 @@ public class PlayingState implements GameState {
         }
     }
 
-    // 🔥 NEW: coin collision
+    // ========================================================
+    //                NEW: COIN COLLISIONS
+    // ========================================================
+
     private void checkCoinCollisions() {
         Rectangle collider = player.getCollider();
         for (Coin c : coinFactory.getActiveCoins()) {
             if (c.isColliding(collider)) {
                 c.setInactive();
+                coinFactory.releaseCoin(c);
                 GameManager.getInstance().addCoin();
             }
         }
@@ -229,17 +245,18 @@ public class PlayingState implements GameState {
             obs.render(shapeRenderer);
         }
 
-        // 🔥 NEW: render coins
+        // ===== NEW: RENDER COINS =====
+        shapeRenderer.setColor(Color.YELLOW);
         for (Coin c : coinFactory.getActiveCoins()) {
-            shapeRenderer.setColor(Color.YELLOW);
             c.renderShape(shapeRenderer);
         }
 
         shapeRenderer.end();
 
+        // UI Observer -> NEW: kirim score + coins
         scoreUIObserver.render(
-                GameManager.getInstance().getScore(),
-                GameManager.getInstance().getCoins()
+            GameManager.getInstance().getScore(),
+            GameManager.getInstance().getCoins()
         );
     }
 
@@ -249,7 +266,7 @@ public class PlayingState implements GameState {
         if (spriteBatch != null) spriteBatch.dispose();
 
         obstacleFactory.releaseAllObstacles();
-        coinFactory.releaseAll(); // NEW
+        coinFactory.releaseAll();  // sesuai instruksi
         scoreUIObserver.dispose();
         background.dispose();
     }

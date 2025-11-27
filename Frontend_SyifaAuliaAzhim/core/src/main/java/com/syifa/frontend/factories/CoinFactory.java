@@ -20,7 +20,6 @@ public class CoinFactory {
     }
 
     public void createCoinPattern(float spawnX, float groundTopY) {
-        // 30% chance
         if (random.nextFloat() > 0.3f) return;
 
         for (int i = 0; i < 3; i++) {

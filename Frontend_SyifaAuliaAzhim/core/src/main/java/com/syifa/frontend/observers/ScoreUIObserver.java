@@ -19,16 +19,20 @@ public class ScoreUIObserver implements Observer {
     @Override
     public void update(int score) {
         System.out.println("[ScoreUIObserver] Skor diperbarui: " + score);
+        Gdx.app.log("ScoreUI", "Score updated: " + score);
     }
 
     public void render(int score) {
         batch.begin();
         font.draw(batch, "Score: " + score, 20, 460); // kiri atas layar
+        font.draw(batch, "Score: " + score, 10, Gdx.graphics.getHeight() - 20);
         batch.end();
     }
 
     public void dispose() {
-        if (font != null) font.dispose();
-        if (batch != null) batch.dispose();
+//        if (font != null)
+            font.dispose();
+//        if (batch != null)
+            batch.dispose();
     }
 }

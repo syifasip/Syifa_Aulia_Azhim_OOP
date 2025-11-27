@@ -15,8 +15,6 @@ public class Main extends Game {
     public void create() {
         spriteBatch = new SpriteBatch();
         gsm = new GameStateManager();
-
-        // Mulai dari MENU, bukan langsung gameplay
         gsm.push(new MenuState(gsm));
     }
 
