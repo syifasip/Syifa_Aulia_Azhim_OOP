@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;   // ✔ FIX
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -43,6 +44,7 @@ public class MenuState implements GameState {
         BitmapFont font = new BitmapFont();
         skin.add("default-font", font);
 
+        // --- TEXTURES ---
         Pixmap pixmapWhite = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
         pixmapWhite.setColor(Color.WHITE);
         pixmapWhite.fill();
@@ -61,19 +63,22 @@ public class MenuState implements GameState {
         Texture texDark = new Texture(pixmapDark);
         skin.add("dark_gray", texDark);
 
+        // --- LABEL STYLE ---
         Label.LabelStyle lblStyle = new Label.LabelStyle();
         lblStyle.font = font;
         lblStyle.fontColor = Color.WHITE;
-        skin.add("default", lblStyle); // default label style
+        skin.add("default", lblStyle);
 
+        // --- TEXTFIELD STYLE (FIXED) ---
         TextField.TextFieldStyle tfStyle = new TextField.TextFieldStyle();
         tfStyle.font = font;
         tfStyle.fontColor = Color.WHITE;
-        tfStyle.cursor = new TextureRegionDrawable(new TextureRegionDrawable(new TextureRegion(texWhite)));
-        tfStyle.selection = new TextureRegionDrawable(new TextureRegionDrawable(new TextureRegion(texGray)));
-        tfStyle.background = new TextureRegionDrawable(new TextureRegion(texDark));
+        tfStyle.cursor = new TextureRegionDrawable(new TextureRegion(texWhite));    // ✔ FIX
+        tfStyle.selection = new TextureRegionDrawable(new TextureRegion(texGray));  // ✔ FIX
+        tfStyle.background = new TextureRegionDrawable(new TextureRegion(texDark)); // ✔ FIX
         skin.add("default-textfield", tfStyle);
 
+        // --- TEXTBUTTON STYLE ---
         TextButton.TextButtonStyle tbStyle = new TextButton.TextButtonStyle();
         tbStyle.font = font;
         tbStyle.up = new TextureRegionDrawable(new TextureRegion(texGray));

@@ -13,7 +13,7 @@ public class Coin {
     private boolean active;
 
     private float bobOffset = 0f;
-    private float bobSpeed = 2f; // bisa kamu sesuaikan
+    private float bobSpeed = 2f;
 
     public Coin(Vector2 startPosition) {
         this.position = new Vector2(startPosition);
@@ -55,4 +55,13 @@ public class Coin {
     public boolean isActive() {
         return active;
     }
+
+    public boolean isOffScreenCamera(float cameraLeftX) {
+        return position.x + radius < cameraLeftX;
+    }
+
+    public void setInactive() {
+        this.active = false;
+    }
+
 }
